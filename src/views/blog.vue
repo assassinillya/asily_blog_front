@@ -1,30 +1,18 @@
 <template>
   <div class="content">
-
     <div class="center">
-      <div class="info">
-        <profile />
-      </div>
       <div class="msg">
         <comments v-if="blogId" :blogId="blogId" />
       </div>
     </div>
-
-
-
   </div>
-
 </template>
 
 
 <script>
-import NavTop from '../components/navTop.vue';
-import Profile from '../components/profile.vue';
 import Comments from '../components/comments.vue';
 export default {
   components: {
-    NavTop,
-    Profile,
     Comments
   },
   data() {
@@ -52,34 +40,18 @@ export default {
 <style scoped>
 .content {
   position: relative;
-  /* 相对定位，确保内容覆盖在动画上 */
   z-index: 1;
-  /* 内容层级高于背景 */
-  padding: 20px;
+  padding: 0 24px 24px;
   text-align: center;
 }
 
 .center {
-  display: flex;
-  margin: auto;
-  margin-top: 70px;
-  justify-content: center;
-  width: 1300px;
-}
-
-.info {
-  /* position: fixed; */
-  margin-top: -180px;
-  width: 400px;
-  display: flex;
-  z-index: 1;
+  max-width: 980px;
+  margin: 0 auto;
 }
 
 .msg {
-  /* position: fixed; */
   z-index: 1;
-  flex: 1;
-  width: 400px;
-
+  width: 100%;
 }
 </style>

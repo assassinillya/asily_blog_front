@@ -79,7 +79,7 @@ a:active {
 }
 
 .nav-top-ctn {
-    z-index: 9999;
+    z-index: 10000;
     position: fixed;
     display: flex;
     justify-content: center;

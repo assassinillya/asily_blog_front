@@ -1,0 +1,2624 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "默认模块",
+    "description": "博客详情接口。调用成功后，文章阅读量自动加 1。",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "博客"
+    },
+    {
+      "name": "标签"
+    },
+    {
+      "name": "评论"
+    },
+    {
+      "name": "FriendLink"
+    },
+    {
+      "name": "Blog"
+    },
+    {
+      "name": "Tag"
+    },
+    {
+      "name": "Comment"
+    }
+  ],
+  "paths": {
+    "/blogs": {
+      "post": {
+        "summary": "创建新博客",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "博客"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "examples": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "编辑博客",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "博客"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFzaWx5IiwicGFzc1dvcmQiOiIxMjM0NTYiLCJleHAiOjE3MjgzNzI2MTd9.b3_D3RuOBYWMK1Fp74xTfKE15eEgZeDZ9rjHVWcyzns",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "examples": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "get": {
+        "summary": "分页获取博客列表",
+        "deprecated": false,
+        "description": "返回博客摘要列表，不包含正文 content。用于博客首页、归档页或用户点击前的列表展示。",
+        "operationId": "getBlogList",
+        "tags": [
+          "博客",
+          "Blog"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "页码，默认 1",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "example": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "每页条数，默认 10",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BlogListItem"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  },
+                  "required": [
+                    "list",
+                    "pagination"
+                  ]
+                },
+                "example": {
+                  "list": [
+                    {
+                      "_id": "660f7f8c8d3a8c4a8f7d1234",
+                      "title": "Gin + MongoDB 博客接口设计",
+                      "tags": [
+                        "golang",
+                        "mongodb"
+                      ],
+                      "createdAt": "2026-03-23T20:00:00Z",
+                      "updatedAt": "2026-03-23T20:00:00Z",
+                      "views": 11,
+                      "like": 5,
+                      "likeCount": 5,
+                      "unlikeCount": 1
+                    }
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "limit": 10,
+                    "total": 36
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务端错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "error": "查询失败: internal error"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "删除博客",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "博客"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFzaWx5IiwicGFzc1dvcmQiOiIxMjM0NTYiLCJleHAiOjE3MjgzNzI2MTd9.b3_D3RuOBYWMK1Fp74xTfKE15eEgZeDZ9rjHVWcyzns",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/blog/viewAdd": {
+      "put": {
+        "summary": "阅读量增加1",
+        "deprecated": true,
+        "description": "",
+        "tags": [
+          "博客"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/blogs/{blogId}": {
+      "get": {
+        "summary": "查看博客详情",
+        "deprecated": false,
+        "description": "根据博客 ID 获取完整博客内容。该接口面向用户点击列表后的详情页展示，成功访问后数据库中的 views 自动加 1，响应中返回的也是加 1 后的值。",
+        "operationId": "getBlogDetail",
+        "tags": [
+          "博客",
+          "Blog"
+        ],
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "path",
+            "description": "博客 ID（MongoDB ObjectID）",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "660f7f8c8d3a8c4a8f7d1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BlogDetail"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "example": {
+                  "data": {
+                    "_id": "660f7f8c8d3a8c4a8f7d1234",
+                    "title": "Gin + MongoDB 博客接口设计",
+                    "content": "# 标题\n\n这里是博客正文。",
+                    "tags": [
+                      "golang",
+                      "mongodb"
+                    ],
+                    "createdAt": "2026-03-23T20:00:00Z",
+                    "updatedAt": "2026-03-23T20:00:00Z",
+                    "views": 12,
+                    "like": 5,
+                    "likeCount": 5,
+                    "unlikeCount": 1
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "博客 ID 非法",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "error": "无效的博客ID格式"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "博客不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "error": "找不到此博客"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务端错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "error": "查询博客失败: internal error"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/blog/getBlog/:blogId": {
+      "get": {
+        "summary": "查看博客",
+        "deprecated": true,
+        "description": "",
+        "tags": [
+          "博客"
+        ],
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "66fa6fd2acf20e8af6910da2",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/blog/getBlogs/{page}/{limit}": {
+      "get": {
+        "summary": "获取所有博客详情",
+        "deprecated": true,
+        "description": "",
+        "tags": [
+          "博客"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "1000",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFzaWx5IiwicGFzc1dvcmQiOiIxMjM0NTYiLCJleHAiOjE3Mjg3MjI4ODh9.IF7-g1boCKrjcYRC4g_fXsdNTMCLg-3QHTln2CtO7v4",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/blogs/count": {
+      "get": {
+        "summary": "获取博客总数",
+        "deprecated": false,
+        "description": "返回博客总数量，常用于分页组件初始化或首页统计展示。",
+        "operationId": "getBlogCount",
+        "tags": [
+          "博客",
+          "Blog"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "count"
+                  ]
+                },
+                "example": {
+                  "count": 36
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务端错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "error": "查询博客数量失败: internal error"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/blogs/search": {
+      "get": {
+        "summary": "模糊搜索博客",
+        "deprecated": false,
+        "description": "根据搜索词模糊匹配博客标题、标签和正文内容。适用于站内搜索栏。",
+        "operationId": "searchBlogs",
+        "tags": [
+          "博客",
+          "Blog"
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "搜索关键词",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "golang"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "keyword": {
+                      "type": "string"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BlogListItem"
+                      }
+                    }
+                  },
+                  "required": [
+                    "keyword",
+                    "total",
+                    "list"
+                  ]
+                },
+                "example": {
+                  "keyword": "golang",
+                  "total": 2,
+                  "list": [
+                    {
+                      "_id": "660f7f8c8d3a8c4a8f7d1234",
+                      "title": "Gin + MongoDB 博客接口设计",
+                      "tags": [
+                        "golang",
+                        "mongodb"
+                      ],
+                      "createdAt": "2026-03-23T20:00:00Z",
+                      "updatedAt": "2026-03-23T20:00:00Z",
+                      "views": 11,
+                      "like": 5,
+                      "likeCount": 5,
+                      "unlikeCount": 1
+                    },
+                    {
+                      "_id": "660f7f8c8d3a8c4a8f7d5678",
+                      "title": "Go 语言错误处理实践",
+                      "tags": [
+                        "golang",
+                        "backend"
+                      ],
+                      "createdAt": "2026-03-20T10:00:00Z",
+                      "updatedAt": "2026-03-21T10:00:00Z",
+                      "views": 7,
+                      "like": 2,
+                      "likeCount": 2,
+                      "unlikeCount": 0
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "缺少搜索关键词",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "error": "请输入搜索关键词"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务端错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "error": "查询失败: internal error"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/blog/getBlogs/search": {
+      "post": {
+        "summary": "模糊匹配博客",
+        "deprecated": true,
+        "description": "",
+        "tags": [
+          "博客"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFzaWx5IiwicGFzc1dvcmQiOiIxMjM0NTYiLCJleHAiOjE3Mjg3MjI4ODh9.IF7-g1boCKrjcYRC4g_fXsdNTMCLg-3QHTln2CtO7v4",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/blogs/unlike": {
+      "put": {
+        "summary": "取消博客点赞",
+        "deprecated": false,
+        "description": "根据博客 ID 取消一次博客点赞。只有当前 like 大于 0 时才允许取消，成功后 unlikeCount 加 1。",
+        "operationId": "unLikeBlog",
+        "tags": [
+          "博客",
+          "Blog"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogLikeRequest"
+              },
+              "example": {
+                "_id": "660f7f8c8d3a8c4a8f7d1234"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "取消点赞成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "example": {
+                  "code": 200,
+                  "message": "博客取消点赞成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误或点赞数已为 0",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "invalidId": {
+                    "summary": "invalidId",
+                    "value": {
+                      "code": 400,
+                      "error": "无效的博客ID格式"
+                    }
+                  },
+                  "likeAlreadyZero": {
+                    "summary": "likeAlreadyZero",
+                    "value": {
+                      "code": 400,
+                      "error": "点赞数已经是0，无法取消点赞"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "博客不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "code": 404,
+                  "error": "该博客不存在"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务端错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "code": 500,
+                  "error": "取消点赞失败: internal error"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/blogs/like": {
+      "put": {
+        "summary": "点赞博客",
+        "deprecated": false,
+        "description": "根据博客 ID 给博客点赞。成功后博客的 like 和 likeCount 都会加 1。",
+        "operationId": "likeBlog",
+        "tags": [
+          "博客",
+          "Blog"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogLikeRequest"
+              },
+              "example": {
+                "_id": "660f7f8c8d3a8c4a8f7d1234"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "点赞成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "example": {
+                  "code": 200,
+                  "message": "博客点赞成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "code": 400,
+                  "error": "无效的博客ID格式"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "博客不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "code": 404,
+                  "error": "该博客不存在"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务端错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "code": 500,
+                  "error": "点赞失败: internal error"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/tags": {
+      "get": {
+        "summary": "获取所有标签",
+        "deprecated": false,
+        "description": "返回全部标签列表，按标签引用次数 count 降序排序，适用于博客筛选和标签云展示。",
+        "operationId": "getTags",
+        "tags": [
+          "标签",
+          "Tag"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer"
+                    },
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TagItem"
+                      }
+                    }
+                  },
+                  "required": [
+                    "total",
+                    "list"
+                  ]
+                },
+                "example": {
+                  "total": 3,
+                  "list": [
+                    {
+                      "id": "660f7f8c8d3a8c4a8f7d9001",
+                      "name": "golang",
+                      "count": 12
+                    },
+                    {
+                      "id": "660f7f8c8d3a8c4a8f7d9002",
+                      "name": "mongodb",
+                      "count": 9
+                    },
+                    {
+                      "id": "660f7f8c8d3a8c4a8f7d9003",
+                      "name": "backend",
+                      "count": 6
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务端错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "error": "查询标签失败: internal error"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/comments/add": {
+      "post": {
+        "summary": "添加评论",
+        "deprecated": true,
+        "description": "",
+        "tags": [
+          "评论"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/comments/delete": {
+      "delete": {
+        "summary": "删除评论",
+        "deprecated": true,
+        "description": "",
+        "tags": [
+          "评论"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/comments/like": {
+      "put": {
+        "summary": "点赞评论",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "评论"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/comments/reset": {
+      "put": {
+        "summary": "编辑评论",
+        "deprecated": true,
+        "description": "",
+        "tags": [
+          "评论"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/comments/get/{blogId}/{page}/{limit}": {
+      "get": {
+        "summary": "获取所有评论",
+        "deprecated": true,
+        "description": "",
+        "tags": [
+          "评论"
+        ],
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "1000",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFzaWx5IiwicGFzc1dvcmQiOiIxMjM0NTYiLCJleHAiOjE3Mjg3MjI4ODh9.IF7-g1boCKrjcYRC4g_fXsdNTMCLg-3QHTln2CtO7v4",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/comments/unlike": {
+      "put": {
+        "summary": "取消点赞评论",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "评论"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/comments/get/count/{blogId}": {
+      "get": {
+        "summary": "获取所有评论数量",
+        "deprecated": true,
+        "description": "",
+        "tags": [
+          "评论"
+        ],
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFzaWx5IiwicGFzc1dvcmQiOiIxMjM0NTYiLCJleHAiOjE3Mjg3MjI4ODh9.IF7-g1boCKrjcYRC4g_fXsdNTMCLg-3QHTln2CtO7v4",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/comments": {
+      "post": {
+        "summary": "新增评论",
+        "deprecated": false,
+        "description": "为指定博客新增一条评论。",
+        "operationId": "addComment",
+        "tags": [
+          "评论",
+          "Comment"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "blogId": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  },
+                  "qq": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "blogId",
+                  "username",
+                  "content"
+                ]
+              },
+              "example": {
+                "blogId": "660f7f8c8d3a8c4a8f7d1234",
+                "username": "asily",
+                "qq": "123456",
+                "content": "这篇文章写得很清楚。"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "新增成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "message": "评论插入成功",
+                  "id": "660f7f8c8d3a8c4a8f7da001"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "编辑评论",
+        "deprecated": false,
+        "description": "编辑指定评论内容，当前为管理员接口。",
+        "operationId": "updateComment",
+        "tags": [
+          "评论",
+          "Comment"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "_id",
+                  "content"
+                ]
+              },
+              "example": {
+                "_id": "660f7f8c8d3a8c4a8f7da001",
+                "content": "更新后的评论内容"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "编辑成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "message": "评论编辑成功"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "删除评论",
+        "deprecated": false,
+        "description": "删除指定评论，当前为管理员接口。",
+        "operationId": "deleteComment",
+        "tags": [
+          "评论",
+          "Comment"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "_id"
+                ]
+              },
+              "example": {
+                "_id": "660f7f8c8d3a8c4a8f7da001"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "message": "评论删除成功"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/comments/{blogId}": {
+      "get": {
+        "summary": "分页获取当前博客评论",
+        "deprecated": false,
+        "description": "分页查询指定博客下的全部评论，按创建时间升序返回。",
+        "operationId": "getCommentsByBlog",
+        "tags": [
+          "评论",
+          "Comment"
+        ],
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CommentItem"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                },
+                "example": {
+                  "list": [
+                    {
+                      "id": "660f7f8c8d3a8c4a8f7da001",
+                      "blogId": "660f7f8c8d3a8c4a8f7d1234",
+                      "username": "asily",
+                      "qq": "123456",
+                      "content": "这篇文章写得很清楚。",
+                      "createdAt": "2026-03-23T21:00:00Z",
+                      "like": 0,
+                      "likeCount": 3,
+                      "unlikeCount": 3
+                    }
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "limit": 10,
+                    "total": 8
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/comments/count/{blogId}": {
+      "get": {
+        "summary": "获取博客评论数量",
+        "deprecated": false,
+        "description": "返回指定博客的评论总数。",
+        "operationId": "getCommentCount",
+        "tags": [
+          "评论",
+          "Comment"
+        ],
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "count": 8
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/friend-links": {
+      "get": {
+        "summary": "分页获取友情链接列表",
+        "deprecated": false,
+        "description": "公开接口。返回友情链接列表以及分页信息，默认按 MongoDB `_id` 倒序返回。",
+        "operationId": "getFriendLinks",
+        "tags": [
+          "FriendLink"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "页码，默认 1",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "example": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "每页条数，默认 10",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/FriendLink"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  },
+                  "required": [
+                    "list",
+                    "pagination"
+                  ]
+                },
+                "example": {
+                  "list": [
+                    {
+                      "_id": "67e4f73c6d68b15fcd2b1001",
+                      "name": "OpenAI",
+                      "url": "https://openai.com",
+                      "description": "AI 产品与研究官方网站",
+                      "avatar": "https://openai.com/favicon.ico"
+                    },
+                    {
+                      "_id": "67e4f73c6d68b15fcd2b1002",
+                      "name": "Gin",
+                      "url": "https://gin-gonic.com",
+                      "description": "Go Web Framework",
+                      "avatar": "https://gin-gonic.com/favicon.ico"
+                    }
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "limit": 10,
+                    "total": 2
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务端错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "查询友情链接失败: internal error"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "新增友情链接",
+        "deprecated": false,
+        "description": "管理员接口。创建一条新的友情链接记录。",
+        "operationId": "addFriendLink",
+        "tags": [
+          "FriendLink"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FriendLinkCreateRequest"
+              },
+              "example": {
+                "name": "OpenAI",
+                "url": "https://openai.com",
+                "description": "AI 产品与研究官方网站",
+                "avatar": "https://openai.com/favicon.ico"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "创建成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FriendLink"
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                },
+                "example": {
+                  "message": "友情链接添加成功",
+                  "data": {
+                    "_id": "67e4f73c6d68b15fcd2b1001",
+                    "name": "OpenAI",
+                    "url": "https://openai.com",
+                    "description": "AI 产品与研究官方网站",
+                    "avatar": "https://openai.com/favicon.ico"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidJson": {
+                    "summary": "JSON 结构错误",
+                    "value": {
+                      "error": "无效的请求数据: invalid character"
+                    }
+                  },
+                  "emptyName": {
+                    "summary": "名称为空",
+                    "value": {
+                      "error": "友情链接名称不能为空"
+                    }
+                  },
+                  "emptyUrl": {
+                    "summary": "地址为空",
+                    "value": {
+                      "error": "友情链接地址不能为空"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "未授权或 Token 无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "error": "未提供有效的认证信息"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务端错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "友情链接插入失败: internal error"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "更新友情链接",
+        "deprecated": false,
+        "description": "管理员接口。根据请求体中的 `_id` 更新友情链接。",
+        "operationId": "updateFriendLink",
+        "tags": [
+          "FriendLink"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FriendLinkUpdateRequest"
+              },
+              "example": {
+                "_id": "67e4f73c6d68b15fcd2b1001",
+                "name": "OpenAI 官方站点",
+                "url": "https://openai.com",
+                "description": "AI 产品、API 与研究官方网站",
+                "avatar": "https://openai.com/favicon.ico"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FriendLink"
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                },
+                "example": {
+                  "message": "友情链接更新成功",
+                  "data": {
+                    "_id": "67e4f73c6d68b15fcd2b1001",
+                    "name": "OpenAI 官方站点",
+                    "url": "https://openai.com",
+                    "description": "AI 产品、API 与研究官方网站",
+                    "avatar": "https://openai.com/favicon.ico"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingId": {
+                    "summary": "缺少 ID",
+                    "value": {
+                      "error": "友情链接ID不能为空"
+                    }
+                  },
+                  "invalidId": {
+                    "summary": "ID 格式错误",
+                    "value": {
+                      "error": "无效的友链ID格式"
+                    }
+                  },
+                  "emptyName": {
+                    "summary": "名称为空",
+                    "value": {
+                      "error": "友情链接名称不能为空"
+                    }
+                  },
+                  "emptyUrl": {
+                    "summary": "地址为空",
+                    "value": {
+                      "error": "友情链接地址不能为空"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "未授权或 Token 无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "error": "未提供有效的认证信息"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "友链不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "找不到要更新的友情链接"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务端错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "友情链接更新失败: internal error"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "删除友情链接",
+        "deprecated": false,
+        "description": "管理员接口。根据请求体中的 `_id` 删除友情链接。",
+        "operationId": "deleteFriendLink",
+        "tags": [
+          "FriendLink"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FriendLinkDeleteRequest"
+              },
+              "example": {
+                "_id": "67e4f73c6d68b15fcd2b1001"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "example": {
+                  "message": "友情链接删除成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidJson": {
+                    "summary": "JSON 结构错误",
+                    "value": {
+                      "error": "无效的请求数据: invalid character"
+                    }
+                  },
+                  "invalidId": {
+                    "summary": "ID 格式错误",
+                    "value": {
+                      "error": "无效的友链ID格式"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "未授权或 Token 无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "error": "未提供有效的认证信息"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "友链不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "找不到要删除的友情链接"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务端错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "友情链接删除失败: internal error"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "登录接口",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "examples": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/test": {
+      "post": {
+        "summary": "测试接口",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/ping": {
+      "post": {
+        "summary": "测试get",
+        "deprecated": true,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BlogDetail": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "views": {
+            "type": "integer"
+          },
+          "like": {
+            "type": "integer"
+          },
+          "likeCount": {
+            "type": "integer"
+          },
+          "unlikeCount": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "_id",
+          "title",
+          "content",
+          "tags",
+          "createdAt",
+          "updatedAt",
+          "views",
+          "like",
+          "likeCount",
+          "unlikeCount"
+        ]
+      },
+      "BlogListItem": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "views": {
+            "type": "integer"
+          },
+          "like": {
+            "type": "integer"
+          },
+          "likeCount": {
+            "type": "integer"
+          },
+          "unlikeCount": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "_id",
+          "title",
+          "tags",
+          "createdAt",
+          "updatedAt",
+          "views",
+          "like",
+          "likeCount",
+          "unlikeCount"
+        ]
+      },
+      "FriendLink": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "友情链接 ID",
+            "example": "67e4f73c6d68b15fcd2b1001"
+          },
+          "name": {
+            "type": "string",
+            "description": "友情链接名称",
+            "example": "OpenAI"
+          },
+          "url": {
+            "type": "string",
+            "description": "友情链接地址",
+            "example": "https://openai.com"
+          },
+          "description": {
+            "type": "string",
+            "description": "友情链接描述",
+            "example": "AI 产品与研究官方网站"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "友情链接头像地址",
+            "example": "https://openai.com/favicon.ico"
+          }
+        },
+        "required": [
+          "_id",
+          "name",
+          "url",
+          "description",
+          "avatar"
+        ]
+      },
+      "FriendLinkCreateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "友情链接名称"
+          },
+          "url": {
+            "type": "string",
+            "description": "友情链接地址"
+          },
+          "description": {
+            "type": "string",
+            "description": "友情链接描述"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "友情链接头像地址"
+          }
+        },
+        "required": [
+          "name",
+          "url"
+        ]
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total"
+        ]
+      },
+      "FriendLinkUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "友情链接 ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "友情链接名称"
+          },
+          "url": {
+            "type": "string",
+            "description": "友情链接地址"
+          },
+          "description": {
+            "type": "string",
+            "description": "友情链接描述"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "友情链接头像地址"
+          }
+        },
+        "required": [
+          "_id",
+          "name",
+          "url"
+        ]
+      },
+      "BlogLikeRequest": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "博客 ID（MongoDB ObjectID）"
+          }
+        },
+        "required": [
+          "_id"
+        ]
+      },
+      "TagItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "count"
+        ]
+      },
+      "FriendLinkDeleteRequest": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "友情链接 ID"
+          }
+        },
+        "required": [
+          "_id"
+        ]
+      },
+      "MessageResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
+      "CommentItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "blogId": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "qq": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "like": {
+            "type": "integer"
+          },
+          "likeCount": {
+            "type": "integer"
+          },
+          "unlikeCount": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "blogId",
+          "username",
+          "qq",
+          "content",
+          "createdAt",
+          "like",
+          "likeCount",
+          "unlikeCount"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "错误信息"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      }
+    },
+    "responses": {},
+    "securitySchemes": {
+      "authToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "servers": [],
+  "security": []
+}

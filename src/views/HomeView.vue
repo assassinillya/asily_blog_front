@@ -12,7 +12,8 @@
 <script>
 import SearchBlog from '@/components/searchBlog.vue';
 import profile from '@/components/profile.vue';
-import axios from 'axios';
+import api from '@/axios';
+import { getList } from '@/apiResponse';
 
 export default {
   data() {
@@ -25,37 +26,45 @@ export default {
     profile,
   },
   created() {
-    // 初始加载数据
     this.fetchData();
   },
-  created() {
-    this.init()
-  },
   watch: {
-    // 监听路由变化，重新加载数据
     '$route.query.searchWord': 'fetchData'
   },
   methods: {
     fetchData() {
       const searchWord = this.$route.query.searchWord;
       if (searchWord) {
-        axios.post('/blog/getBlogs/search', {
-          search: searchWord,
+        api.get('/blogs/search', {
+          params: {
+            q: searchWord,
+          }
         })
           .then(rep => {
-            this.searchRep = rep.data.blogs;
+            this.searchRep = getList(rep).map(post => ({
+              ...post,
+              content: post.content || '',
+            }));
           })
           .catch(error => {
             console.log(error);
           });
       } else {
-        this.init()
+        this.init();
       }
     },
     init(){
-      axios.get(`/blog/getBlogs/${1}/${10000000}`)
+      api.get('/blogs', {
+        params: {
+          page: 1,
+          limit: 10000000,
+        }
+      })
         .then(rep=>{
-          this.searchRep = rep.data.blogs;
+          this.searchRep = getList(rep).map(post => ({
+            ...post,
+            content: post.content || '',
+          }));
         }).catch(error => {
             console.log(error);
       });
@@ -68,24 +77,59 @@ export default {
 .center {
   display: flex;
   justify-content: flex-start;
-  /* 确保内容从左到右排列 */
   align-items: flex-start;
-  /* 确保内容在顶部对齐 */
-  padding-top: 20px;
+  gap: 18px;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 20px 24px 0;
 }
 
 .info {
-  width: 300px;
-  /* 设置左边 profile 的宽度 */
+  width: 220px;
   display: flex;
   flex-shrink: 0;
-  /* 保证 profile 宽度不被压缩 */
-  margin-right: 100px;
-  margin-top: -27px;
+  margin-top: -6px;
+  margin-left: -28px;
 }
 
 .msg {
   flex: 1;
-  /* overflow: auto; */
+  max-width: 860px;
+}
+
+.info :deep(.page-container) {
+  align-items: flex-start;
+}
+
+.info :deep(.background-container) {
+  width: 220px;
+  height: 300px;
+  box-sizing: border-box;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 0;
+  margin-bottom: 10px;
+  padding-left: 0;
+  border-radius: 12px;
+}
+
+.info :deep(.card-container) {
+  width: 220px;
+  box-sizing: border-box;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 0;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.info :deep(.avatar) {
+  width: 84px;
+  height: 84px;
+}
+
+.info :deep(.image) {
+  width: 42px;
+  height: 42px;
 }
 </style>

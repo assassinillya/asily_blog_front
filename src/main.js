@@ -29,10 +29,6 @@ VMdPreview.use(githubTheme, {
   Hljs: hljs,
 });
 
-import axiosInstance from './axios';
-
-// app.config.globalProperties.$axios = axiosInstance;
-
 createApp(App)
   .use(store)
   .use(ElementPlus)

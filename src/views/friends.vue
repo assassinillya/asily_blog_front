@@ -24,7 +24,8 @@
 
 <script>
 import Profile from '../components/profile.vue';
-import axios from 'axios';
+import api from '@/axios';
+import { getList } from '@/apiResponse';
 export default {
     components: {
         Profile // 注册组件
@@ -55,10 +56,14 @@ export default {
     },
     created() {
         // 获取评论
-        axios.get(`/friendLink/get/${1}/${1000}`)
+        api.get('/friend-links', {
+            params: {
+                page: 1,
+                limit: 1000,
+            }
+        })
             .then(rep => {
-                // TODO 还没赋值 total有点问题 明天再搞
-                this.buttons=rep.data.message
+                this.buttons = getList(rep)
                 console.log(this.buttons)
             }).catch(error => {
                 console.log('error: ' + error)

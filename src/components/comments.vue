@@ -29,11 +29,12 @@
         <div class="message-form">
             <p5-title content="发布评论" size="large" font_color="#ff0022" selected_font_color="#000"
                 selected_bg_color="#ff0022"></p5-title>
-            <textarea v-if="useMarkdown == false" style="width: 780px;" v-model="newMessageContent"
+            <textarea v-if="useMarkdown == false" ref="commentTextarea" v-model="newMessageContent"
+                @input="autoResizeTextarea"
                 placeholder="*评论内容"></textarea>
             <v-md-editor v-else v-model="newMessageContent" height="400px"></v-md-editor>
-            <input style="width: 780px;" v-model="newMessageUsername" type="text" placeholder="*昵称" />
-            <input style="width: 780px;" v-model="newMessageQQ" type="email" placeholder="*邮箱/QQ号" />
+            <input v-model="newMessageUsername" type="text" placeholder="*昵称" />
+            <input v-model="newMessageQQ" type="email" placeholder="*邮箱/QQ号" />
             <div class="form-actions">
                 <p5-title content="Markdown编辑器" size="medium"></p5-title>
                 <input class="check" type="checkbox" v-model="useMarkdown" />
@@ -47,7 +48,8 @@
 </template>
 <script>
 import blogs from './blogs.vue';
-import axios from 'axios';
+import api from '@/axios';
+import { getCount, getList, getPagination } from '@/apiResponse';
 export default {
     components: { blogs },
     props: ['blogId'],
@@ -59,45 +61,12 @@ export default {
         return {
             total: this.total,
             blogId: this.blogId,
-            messages: [
-                {
-                    id:"123",
-                    avatar: 'http://q.qlogo.cn/headimg_dl?dst_uin=1145367854&spec=640&img_type=jpg',
-                    username: 'sensei',
-                    content: 'ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧ヽ(๑•̀ㅂ•́)و✧',
-                    date: '2022-6-15',
-                    liked:10,
-                    isLike:false,
-                },
-                {
-                    id:"123",
-                    avatar: 'http://q.qlogo.cn/headimg_dl?dst_uin=1145367854&spec=640&img_type=jpg',
-                    username: 'xiao',
-                    content: ` #include <cstdio>
-#include <iostream>
-#include <algorithm>
-#include <queue>
-#include <cmath>
-`,
-                    date: '2022-8-28',
-                    isLike:false,
-                    liked:10,
-                },
-                {
-                    id:"123",
-                    avatar: 'http://q.qlogo.cn/headimg_dl?dst_uin=1145367854&spec=640&img_type=jpg',
-                    username: 'man',
-                    content: 'so cool太棒了 (๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧太棒了！(๑•̀ㅂ•́)و✧',
-                    date: '2022-8-29',
-                    isLike:false,
-                    liked:10,
-                }
-            ],
+            messages: [],
             newMessageContent: '',
             newMessageUsername: '',
             newMessageQQ: '',
             useMarkdown: false,
-            total: 100,
+            total: 0,
             page: 1,
             limit: 10,
             likedImage: require('@/assets/liked.png'),   // 点赞后的图片路径
@@ -108,7 +77,7 @@ export default {
         like(message){
             console.log(message)
             if (message.isLike === false){
-                axios.put('/comments/like',{
+                api.put('/comments/like',{
                     "_id":message.id
                 }).then(()=>{
                     message.isLike=true
@@ -117,7 +86,7 @@ export default {
                     console.log(error)
                 })
             }else{
-                axios.put('/comments/unlike',{
+                api.put('/comments/unlike',{
                     "_id":message.id
                 }).then(()=>{
                     message.isLike=false
@@ -129,9 +98,9 @@ export default {
             
         },
         getcommentsCount() {
-            axios.get(`/comments/get/count/${this.blogId}`)
+            api.get(`/comments/count/${this.blogId}`)
                 .then(rep => {
-                    this.total = rep.data.count
+                    this.total = getCount(rep)
                 }).catch(error => {
                     console.log(error)
                 })
@@ -144,6 +113,9 @@ export default {
         },
         replyTo(username) {
             this.newMessageContent = `回复 @${username}：`;
+            this.$nextTick(() => {
+                this.autoResizeTextarea()
+            })
         },
         handleCurrentChange(newPage) {
             this.page = newPage
@@ -154,13 +126,14 @@ export default {
             this.getComments()
         },
         addComment() {
-            axios.post('/comments/add', {
-                _id: this.blogId,
+            api.post('/comments', {
+                blogId: this.blogId,
                 content: this.newMessageContent,
-                QQ: this.newMessageQQ,
+                qq: this.newMessageQQ,
                 username: this.newMessageUsername
             }).then(() => {
                 this.getComments()
+                this.getcommentsCount()
             }).catch(error => {
                 console.log(error)
             })
@@ -168,16 +141,33 @@ export default {
             this.newMessageContent = '';
             this.newMessageUsername = '';
             this.newMessageQQ = '';
+            this.$nextTick(() => {
+                this.autoResizeTextarea()
+            })
         },
         linkToqq(url) {
             const qqMatch = url.match(/dst_uin=(\d+)/);
             const qq = qqMatch ? qqMatch[1] : null;
             return qq
         },
+        autoResizeTextarea() {
+            const textarea = this.$refs.commentTextarea
+            if (!textarea) {
+                return
+            }
+            textarea.style.height = 'auto'
+            textarea.style.height = `${Math.max(textarea.scrollHeight, 120)}px`
+        },
         getComments() {
-            axios.get(`/comments/get/${this.blogId}/${this.page}/${this.limit}`)
+            api.get(`/comments/${this.blogId}`, {
+                params: {
+                    page: this.page,
+                    limit: this.limit,
+                }
+            })
                 .then(rep => {
-                    const response = rep.data.comments
+                    const response = getList(rep)
+                    this.total = getPagination(rep).total || this.total
 
                     this.messages = response.map(comment => ({
                         id:comment.id,
@@ -225,17 +215,20 @@ export default {
 .message-board {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    margin-left: 2.2%;
-    height: 915px;
-    /* 保证留言表单在页面底部 */
-    padding: 20px;
+    justify-content: flex-start;
+    gap: 12px;
+    margin-left: 0;
+    height: auto;
+    width: 100%;
+    max-width: 920px;
+    padding: 12px 0 20px;
+    box-sizing: border-box;
     background-size: cover;
 }
 
 .message-list {
-    width: 800px;
-    padding: 800px;
+    width: 100%;
+    box-sizing: border-box;
     background-color: white;
     border-radius: 8px;
     padding: 15px;
@@ -305,7 +298,8 @@ export default {
 }
 
 .message-form {
-    width: 790px;
+    width: 100%;
+    box-sizing: border-box;
     top: auto;
     background-color: white;
     border-radius: 8px;
@@ -317,11 +311,14 @@ export default {
 
 textarea {
     width: 100%;
-    height: 100px;
+    min-height: 120px;
     margin-bottom: 10px;
     border-radius: 5px;
     border: 1px solid #ddd;
     padding: 10px;
+    box-sizing: border-box;
+    resize: none;
+    overflow: hidden;
 }
 
 input {
@@ -330,6 +327,12 @@ input {
     border-radius: 5px;
     border: 1px solid #ddd;
     padding: 10px;
+    box-sizing: border-box;
+}
+
+.message-form :deep(.v-md-editor) {
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .form-actions {

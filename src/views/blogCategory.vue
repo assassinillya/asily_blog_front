@@ -11,7 +11,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+import api from '@/axios';
+import { getList } from '@/apiResponse';
 
 
 export default {
@@ -23,8 +24,7 @@ export default {
     },
     methods: {
         clickTag(tag) {
-            // console.log(tag.text)
-            this.$router.push({ path: '/home', query: { searchWord: tag.text } });
+            this.$router.push({ path: '/home', query: { searchWord: tag.name } });
         },
         getRandomColor() {
             const r = Math.floor(Math.random() * 256);
@@ -36,9 +36,9 @@ export default {
         }
     },
     created() {
-        axios.get('/tags')
+        api.get('/tags')
             .then(rep => {
-                const tagData = rep.data.message;
+                const tagData = getList(rep);
                 // const excludedColors = [];
 
                 tagData.forEach(tag => {

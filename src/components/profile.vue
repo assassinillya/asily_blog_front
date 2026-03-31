@@ -39,7 +39,8 @@
 
 <script>
 import { P5Text } from 'p5-ui'
-import axios from 'axios'
+import api from '@/axios'
+import { getCount, getList } from '@/apiResponse'
 export default {
     components: {
         P5Text
@@ -48,13 +49,10 @@ export default {
         return {
             // 分类导航的数据
             categories: {
-                '文章': 7,
+                '文章': 0,
             },
             // 标签数组
-            tags: [
-                { name: "golang", count: 2 },
-                { name: "mygo", count: 4 },
-            ]
+            tags: []
         }
     },
     methods: {
@@ -63,19 +61,18 @@ export default {
             this.$router.push({ path: '/home', query: { searchWord: tag } });
         },
         fetchTags() {
-            axios.get('/tags')
+            api.get('/tags')
                 .then(rep => {
-                    const tagData = rep.data.message;
+                    const tagData = getList(rep);
                     this.tags = tagData.filter(tag => tag.count !== 0);
                 }).catch(error => {
                     console.log('error: ' + error)
                 })
         },
         getBlogCount(){
-            axios.get('/blog/getBlogs/count')
+            api.get('/blogs/count')
                 .then(rep => {
-                    const tagData = rep.data.message;
-                    this.categories.文章 = tagData
+                    this.categories.文章 = getCount(rep)
                 }).catch(error => {
                     console.log('error: ' + error)
                 })
