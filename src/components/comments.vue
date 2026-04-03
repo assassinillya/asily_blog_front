@@ -1,120 +1,236 @@
 <template>
     <div class="message-board">
-        <blogs :blogId="this.blogId" />
+        <blogs :blogId="blogId" />
         <div class="message-list">
-            <h2>留言板</h2>
-            <div class="message" v-for="(message, index) in messages" :key="index">
-                <img :src="message.avatar" alt="avatar" class="avatar">
-                <div class="message-content">
-                    <button class="reply-button" @click="replyTo(message.username)">回复</button>
-
-                    <div class="message-header">
-                        <span class="username">{{ message.username }}</span>
-                        <span class="date">{{ message.date }}</span>
-                        
-                        <img :src="message.isLike?likedImage:unlikedImage" @click="like(message)" class ="like-icon" >
-                        <p5-text size="medium">{{ message.liked }}</p5-text>
+            <h2>评论区（主楼 + 楼中楼）</h2>
+            <div v-for="(floor, floorIndex) in floors" :key="floor._id" class="floor-card">
+                <div class="comment-row">
+                    <img :src="floor.avatar" alt="avatar" class="avatar">
+                    <div class="comment-main">
+                        <div class="comment-header">
+                            <span class="username">{{ floor.username }}</span>
+                            <span class="floor-tag">{{ floorIndex + 1 }} 楼</span>
+                            <span class="date">{{ floor.date }}</span>
+                        </div>
+                        <v-md-preview class="message-body" :text="floor.displayContent || floor.content"></v-md-preview>
+                        <div class="comment-actions">
+                            <button class="reply-button" @click="setReplyTarget(floor)">
+                                回复
+                            </button>
+                            <img :src="floor.isLike ? likedImage : unlikedImage" @click="toggleLike(floor)" class="like-icon">
+                            <p5-text size="medium">{{ floor.liked }}</p5-text>
+                        </div>
+                        <div v-if="replyTargetId === floor._id" class="inline-reply">
+                            <input v-model="replyUsername" type="text" placeholder="*昵称" class="inline-reply-meta-input" />
+                            <input v-model="replyQQ" type="email" placeholder="*邮箱/QQ号" class="inline-reply-meta-input" />
+                            <textarea
+                                ref="inlineReplyTextarea"
+                                v-model="replyDraftContent"
+                                class="inline-reply-input"
+                                rows="3"
+                                :placeholder="inlineReplyPlaceholder"
+                            />
+                            <div class="inline-reply-actions">
+                                <el-button size="small" @click="cancelReply">取消</el-button>
+                                <el-button size="small" type="primary" :disabled="isReplySubmitDisabled" @click="submitReply">
+                                    发送
+                                </el-button>
+                            </div>
+                        </div>
                     </div>
-                    <v-md-preview class="message-body" :text="message.content"></v-md-preview>
+                </div>
+
+                <div class="reply-list" v-if="floor.replies && floor.replies.length > 0">
+                    <div v-for="reply in floor.replies" :key="reply._id" class="reply-row">
+                        <img :src="reply.avatar" alt="avatar" class="reply-avatar">
+                        <div class="reply-main">
+                            <div class="comment-header">
+                                <span class="username">{{ reply.username }}</span>
+                                <span class="date">{{ reply.date }}</span>
+                            </div>
+                            <v-md-preview class="message-body" :text="reply.displayContent || reply.content"></v-md-preview>
+                            <div class="comment-actions">
+                                <button class="reply-button" @click="setReplyTarget(reply)">
+                                    回复
+                                </button>
+                                <img :src="reply.isLike ? likedImage : unlikedImage" @click="toggleLike(reply)" class="like-icon">
+                                <p5-text size="medium">{{ reply.liked }}</p5-text>
+                            </div>
+                            <div v-if="replyTargetId === reply._id" class="inline-reply inline-reply-nested">
+                                <input v-model="replyUsername" type="text" placeholder="*昵称" class="inline-reply-meta-input" />
+                                <input v-model="replyQQ" type="email" placeholder="*邮箱/QQ号" class="inline-reply-meta-input" />
+                                <textarea
+                                    ref="inlineReplyTextarea"
+                                    v-model="replyDraftContent"
+                                    class="inline-reply-input"
+                                    rows="3"
+                                    :placeholder="inlineReplyPlaceholder"
+                                />
+                                <div class="inline-reply-actions">
+                                    <el-button size="small" @click="cancelReply">取消</el-button>
+                                    <el-button size="small" type="primary" :disabled="isReplySubmitDisabled" @click="submitReply">
+                                        发送
+                                    </el-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
             <div class="pagination">
-                <el-pagination v-model:current-page="currentPage2" v-model:page-size="pageSize2"
-                    :page-sizes="[5, 10, 50, 100]" :size="size" :background="background"
-                    layout="sizes, prev, pager, next" :total="total" @size-change="handleSizeChange"
-                    @current-change="handleCurrentChange" />
+                <el-pagination
+                    :current-page="page"
+                    :page-size="limit"
+                    :page-sizes="[5, 10, 20, 50]"
+                    layout="sizes, prev, pager, next"
+                    :total="total"
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                />
             </div>
         </div>
 
         <div class="message-form">
-            <p5-title content="发布评论" size="large" font_color="#ff0022" selected_font_color="#000"
-                selected_bg_color="#ff0022"></p5-title>
-            <textarea v-if="useMarkdown == false" ref="commentTextarea" v-model="newMessageContent"
+            <p5-title
+                content="发布主楼评论"
+                size="large"
+                font_color="#ff0022"
+                selected_font_color="#000"
+                selected_bg_color="#ff0022"
+            />
+            <textarea
+                v-if="useMarkdown === false"
+                ref="commentTextarea"
+                v-model="newMessageContent"
                 @input="autoResizeTextarea"
-                placeholder="*评论内容"></textarea>
-            <v-md-editor v-else v-model="newMessageContent" height="400px"></v-md-editor>
+                placeholder="输入主楼评论内容"
+            />
+            <v-md-editor v-else v-model="newMessageContent" height="260px" />
             <input v-model="newMessageUsername" type="text" placeholder="*昵称" />
             <input v-model="newMessageQQ" type="email" placeholder="*邮箱/QQ号" />
             <div class="form-actions">
-                <p5-title content="Markdown编辑器" size="medium"></p5-title>
-                <input class="check" type="checkbox" v-model="useMarkdown" />
-                <el-button :disabled="isDisabled" @click="submitMessage">
-                    <p5-title class="p5-hover-animation-mix" content="发送" size="extra-large"></p5-title>
-                </el-button>
-
+                <label class="markdown-switch">
+                    <span>Markdown编辑器</span>
+                    <input class="check" type="checkbox" v-model="useMarkdown" />
+                </label>
+                <div class="form-buttons">
+                    <el-button :disabled="isMainDisabled" type="primary" @click="submitMainComment">
+                        发送
+                    </el-button>
+                </div>
             </div>
         </div>
     </div>
 </template>
+
 <script>
-import blogs from './blogs.vue';
-import api from '@/axios';
-import { getCount, getList, getPagination } from '@/apiResponse';
+import blogs from './blogs.vue'
+import api from '@/axios'
+import { getList, getPagination } from '@/apiResponse'
+
 export default {
     components: { blogs },
     props: ['blogId'],
-    created() {
-        this.getComments()
-        this.getcommentsCount()
-    },
     data() {
         return {
-            total: this.total,
-            blogId: this.blogId,
-            messages: [],
+            floors: [],
             newMessageContent: '',
             newMessageUsername: '',
             newMessageQQ: '',
+            replyUsername: '',
+            replyQQ: '',
+            replyDraftContent: '',
             useMarkdown: false,
             total: 0,
             page: 1,
             limit: 10,
-            likedImage: require('@/assets/liked.png'),   // 点赞后的图片路径
-            unlikedImage: require('@/assets/unliked.png'), // 未点赞的图片路径
+            replyTargetId: '',
+            replyTargetName: '',
+            likedImage: require('@/assets/liked.png'),
+            unlikedImage: require('@/assets/unliked.png'),
+            defaultAvatar: '/docs/b_2b0fe1cc658f87153c005bc947b4530d.jpg',
         }
     },
+    computed: {
+        isMainDisabled() {
+            return this.newMessageUsername === '' || this.newMessageQQ === '' || this.newMessageContent === ''
+        },
+        isReplySubmitDisabled() {
+            return this.replyUsername.trim() === '' || this.replyQQ.trim() === '' || this.replyDraftContent.trim() === ''
+        },
+        inlineReplyPlaceholder() {
+            return '回复被回复人'
+        },
+    },
+    created() {
+        this.getComments()
+    },
     methods: {
-        like(message){
-            console.log(message)
-            if (message.isLike === false){
-                api.put('/comments/like',{
-                    "_id":message.id
-                }).then(()=>{
-                    message.isLike=true
-                    message.liked++
-                }).catch(error=>{
-                    console.log(error)
-                })
-            }else{
-                api.put('/comments/unlike',{
-                    "_id":message.id
-                }).then(()=>{
-                    message.isLike=false
-                    message.liked--
-                }).catch(error=>{
-                    console.log(error)
-                })
+        getQQNumber(input) {
+            if (!input) return null
+
+            const normalized = String(input).trim()
+            const qqNumberMatch = normalized.match(/^\d{5,12}$/)
+            if (qqNumberMatch) return qqNumberMatch[0]
+
+            const qqEmailMatch = normalized.match(/^(\d{5,12})@qq\.com$/i)
+            if (qqEmailMatch) return qqEmailMatch[1]
+
+            return null
+        },
+        getAvatarByQQInput(input) {
+            const qqNumber = this.getQQNumber(input)
+            if (qqNumber) {
+                return `http://q.qlogo.cn/headimg_dl?dst_uin=${qqNumber}&spec=640&img_type=jpg`
             }
-            
+            return this.defaultAvatar
         },
-        getcommentsCount() {
-            api.get(`/comments/count/${this.blogId}`)
-                .then(rep => {
-                    this.total = getCount(rep)
-                }).catch(error => {
-                    console.log(error)
-                })
+        formatDate(dateString) {
+            return new Date(dateString).toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+            })
         },
-        submitMessage() {
-            if (this.newMessageContent !== '' && this.newMessageUsername !== '' && this.newMessageQQ !== '') {
-                this.addComment()
+        normalizeReply(reply) {
+            return {
+                ...reply,
+                avatar: this.getAvatarByQQInput(reply.qq),
+                date: this.formatDate(reply.createdAt),
+                liked: reply.like || 0,
+                isLike: false,
             }
-            // this.$forceUpdate();
         },
-        replyTo(username) {
-            this.newMessageContent = `回复 @${username}：`;
-            this.$nextTick(() => {
-                this.autoResizeTextarea()
+        normalizeFloor(floor) {
+            const replies = Array.isArray(floor.replies) ? floor.replies : []
+            const sortedReplies = [...replies].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+
+            return {
+                ...floor,
+                avatar: this.getAvatarByQQInput(floor.qq),
+                date: this.formatDate(floor.createdAt),
+                liked: floor.like || 0,
+                isLike: false,
+                replies: sortedReplies.map(this.normalizeReply),
+            }
+        },
+        getComments() {
+            api.get(`/comments/${this.blogId}`, {
+                params: {
+                    page: this.page,
+                    limit: this.limit,
+                },
+            }).then(rep => {
+                const list = getList(rep) || []
+                const pagination = getPagination(rep) || {}
+                const sortedFloors = [...list].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+                this.floors = sortedFloors.map(this.normalizeFloor)
+                this.total = pagination.total || 0
+            }).catch(error => {
+                console.log('Error:', error)
             })
         },
         handleCurrentChange(newPage) {
@@ -123,239 +239,302 @@ export default {
         },
         handleSizeChange(newLimit) {
             this.limit = newLimit
+            this.page = 1
             this.getComments()
         },
-        addComment() {
-            api.post('/comments', {
+        setReplyTarget(targetComment) {
+            this.replyTargetId = targetComment._id
+            this.replyTargetName = targetComment.username
+            this.replyDraftContent = ''
+            this.replyUsername = this.newMessageUsername
+            this.replyQQ = this.newMessageQQ
+            this.$nextTick(() => {
+                const el = this.$refs.inlineReplyTextarea
+                const ta = Array.isArray(el) ? el[0] : el
+                if (ta && typeof ta.focus === 'function') {
+                    ta.focus()
+                }
+            })
+        },
+        cancelReply() {
+            this.replyTargetId = ''
+            this.replyTargetName = ''
+            this.replyDraftContent = ''
+            this.replyUsername = ''
+            this.replyQQ = ''
+        },
+        submitMainComment() {
+            if (this.isMainDisabled) return
+
+            const payload = {
                 blogId: this.blogId,
                 content: this.newMessageContent,
                 qq: this.newMessageQQ,
-                username: this.newMessageUsername
-            }).then(() => {
+                username: this.newMessageUsername,
+            }
+
+            api.post('/comments', payload).then(() => {
+                this.newMessageContent = ''
                 this.getComments()
-                this.getcommentsCount()
+                this.$nextTick(() => {
+                    this.autoResizeTextarea()
+                })
             }).catch(error => {
                 console.log(error)
             })
+        },
+        submitReply() {
+            if (this.isReplySubmitDisabled || !this.replyTargetId) return
 
-            this.newMessageContent = '';
-            this.newMessageUsername = '';
-            this.newMessageQQ = '';
-            this.$nextTick(() => {
-                this.autoResizeTextarea()
+            const payload = {
+                blogId: this.blogId,
+                parentId: this.replyTargetId,
+                content: this.replyDraftContent,
+                qq: this.replyQQ,
+                username: this.replyUsername,
+            }
+
+            api.post('/comments', payload).then(() => {
+                this.replyDraftContent = ''
+                this.cancelReply()
+                this.getComments()
+            }).catch(error => {
+                console.log(error)
             })
         },
-        linkToqq(url) {
-            const qqMatch = url.match(/dst_uin=(\d+)/);
-            const qq = qqMatch ? qqMatch[1] : null;
-            return qq
+        toggleLike(commentNode) {
+            const endpoint = commentNode.isLike ? '/comments/unlike' : '/comments/like'
+            api.put(endpoint, { _id: commentNode._id }).then(() => {
+                commentNode.isLike = !commentNode.isLike
+                if (commentNode.isLike) {
+                    commentNode.liked += 1
+                } else {
+                    commentNode.liked = Math.max(0, commentNode.liked - 1)
+                }
+            }).catch(error => {
+                console.log(error)
+            })
         },
         autoResizeTextarea() {
             const textarea = this.$refs.commentTextarea
-            if (!textarea) {
-                return
-            }
+            if (!textarea) return
             textarea.style.height = 'auto'
             textarea.style.height = `${Math.max(textarea.scrollHeight, 120)}px`
         },
-        getComments() {
-            api.get(`/comments/${this.blogId}`, {
-                params: {
-                    page: this.page,
-                    limit: this.limit,
-                }
-            })
-                .then(rep => {
-                    const response = getList(rep)
-                    this.total = getPagination(rep).total || this.total
-
-                    this.messages = response.map(comment => ({
-                        id:comment.id,
-                        avatar: `http://q.qlogo.cn/headimg_dl?dst_uin=${comment.qq}&spec=640&img_type=jpg`,
-                        username: comment.username,
-                        content: comment.content,
-                        date: new Date(comment.createdAt).toLocaleDateString('zh-CN', {
-                            year: 'numeric',
-                            month: 'numeric',
-                            day: 'numeric',
-                        }),
-                        isLike:false,
-                        liked: comment.like,
-                    }))
-                }).catch(error => {
-                    console.log('Error:', error);
-                })
-        }
     },
-    computed: {
-        isDisabled() {
-            return this.newMessageUsername == '' || this.newMessageQQ == '' || this.newMessageContent == ''
-        },
-    }
 }
 </script>
+
 <style scoped>
-.like-icon{
-    cursor: pointer; /* 鼠标悬停时变成手形 */
-    width: 25px;
-    height: 25px;
-}
-
-.like-active {
-    filter: hue-rotate(180deg); /* 点赞后图标变红 */
-}
-
-
-
-.check {
-    margin-left: -480px;
-    margin-top: 10px
-}
-
 .message-board {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
     gap: 12px;
-    margin-left: 0;
-    height: auto;
     width: 100%;
     max-width: 920px;
     padding: 12px 0 20px;
     box-sizing: border-box;
-    background-size: cover;
 }
 
 .message-list {
     width: 100%;
-    box-sizing: border-box;
-    background-color: white;
+    background-color: #fff;
     border-radius: 8px;
     padding: 15px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    flex-grow: 1;
+    box-sizing: border-box;
 }
 
-.message {
-    height: auto;
+.floor-card {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 14px 0;
+}
+
+.comment-row,
+.reply-row {
     display: flex;
-    margin-bottom: auto;
+    gap: 12px;
+}
+
+.reply-row {
+    margin-top: 10px;
+}
+
+.reply-list {
+    margin-left: 48px;
+    margin-top: 8px;
 }
 
 .avatar {
-    height: 80px;
-    border-radius: 25%;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
 }
 
-.message-content {
-    /* margin-top: -1; */
-    flex-grow: 1;
+.reply-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
 }
 
-.message-header {
+.comment-main,
+.reply-main {
+    flex: 1;
+}
+
+.comment-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 10px;
 }
 
 .username {
-    margin-top: -100px;
-    margin-left: -75px;
-    font-weight: bold;
+    font-weight: 700;
 }
 
-.badge {
-    background-color: #3498db;
-    color: white;
-    padding: 2px 6px;
-    border-radius: 3px;
-    margin-left: 10px;
+.floor-tag {
+    font-size: 12px;
+    color: #409eff;
+    background: #ecf5ff;
+    border-radius: 10px;
+    padding: 2px 8px;
 }
 
 .date {
-    margin-left:645px;
     color: #888;
+    font-size: 12px;
 }
 
 .message-body {
-    margin-top: 5px;
     text-align: left;
-    word-wrap: break-word; /* 自动换行 */
-    white-space: normal; /* 让内容正常换行，不保持单行 */
-    overflow-wrap: break-word; /* 支持长单词换行 */
-    max-width: 100%; /* 设置最大宽度以防止溢出 */
+    margin-top: 6px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
 }
 
 .reply-button {
-    background-color: #3498db;
-    color: white;
     border: none;
-    padding: 5px 10px;
-    border-radius: 25px;
+    border-radius: 18px;
+    padding: 4px 10px;
     cursor: pointer;
-    margin-left: 670px;
-    margin-top: -25px;
+    color: #fff;
+    background-color: #409eff;
+}
+
+.like-icon {
+    cursor: pointer;
+    width: 22px;
+    height: 22px;
+}
+
+.pagination {
+    margin-top: 14px;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .message-form {
     width: 100%;
-    box-sizing: border-box;
-    top: auto;
-    background-color: white;
+    background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     margin-top: 10px;
     padding: 20px;
-    border-top: 1px solid #ccc;
+    box-sizing: border-box;
 }
 
-textarea {
+textarea,
+input {
     width: 100%;
-    min-height: 120px;
-    margin-bottom: 10px;
+    margin-top: 10px;
     border-radius: 5px;
     border: 1px solid #ddd;
     padding: 10px;
     box-sizing: border-box;
+}
+
+textarea {
+    min-height: 120px;
     resize: none;
     overflow: hidden;
 }
 
-input {
-    width: 100%;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    padding: 10px;
-    box-sizing: border-box;
-}
-
 .message-form :deep(.v-md-editor) {
     width: 100%;
-    box-sizing: border-box;
+    margin-top: 10px;
 }
 
 .form-actions {
+    margin-top: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
 }
 
-button {
-    background-color: #2ecc71;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.blog {
+.markdown-switch {
     display: flex;
-    color: #2ecc71;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+    font-size: 14px;
 }
 
-.page {
-    float: right;
+.form-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.inline-reply {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: #f7f8fa;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.inline-reply-nested {
+    margin-left: 0;
+}
+
+.inline-reply-input {
+    width: 100%;
+    margin-top: 0;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    padding: 8px 10px;
+    box-sizing: border-box;
+    resize: vertical;
+    min-height: 72px;
+    font-size: 14px;
+}
+
+.inline-reply-meta-input {
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    padding: 8px 10px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.inline-reply-input::placeholder {
+    color: #999;
+}
+
+.inline-reply-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
 }
 </style>
